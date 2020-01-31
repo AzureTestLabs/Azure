@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": { },
+  "variables": { },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2019-10-01",
+      "location": "WestUS",
+      "name": "Core-Network-WestUS-RG",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2019-10-01",
+      "location": "WestUS",
+      "name": "Core-ADDS-WestUS-RG",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2019-10-01",
+      "location": "WestUS",
+      "name": "Core-Management-WestUS-RG",
+      "properties": {}
+    },
+     {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2019-10-01",
+      "location": "WestUS",
+      "name": "Core-DMZ-WestUS-RG",
+      "properties": {}
+    }
+  ]
+}
