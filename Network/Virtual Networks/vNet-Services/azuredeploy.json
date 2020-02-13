@@ -1,0 +1,175 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata":{
+        "comments": "This template was developed for demonstation purposes. It prepares a vNet with 4 subnets",
+        "author": "James Ellis"
+    },
+    "parameters": {
+        "virtualNetworkName": {
+            "defaultValue": "Core-vNet1-WestUS",
+            "type": "String"
+        },
+        "virtualNetworkNameAddressSpace": {
+            "defaultValue": "192.168.0.0/24",
+            "type": "String"
+        },
+        "ActiveDirectorySubnetName": {
+            "defaultValue": "ActiveDirectorySubnet",
+            "type": "String"
+        },
+        "ActiveDirectorySubnetSpace": {
+            "defaultValue": "192.168.0.64/26",
+            "type": "String"
+        },
+        "ManagementSubnetName": {
+            "defaultValue": "ManagementSubnet",
+            "type": "String"
+        },
+        "ManagementSubnetSpace": {
+            "defaultValue": "192.168.0.128/26",
+            "type": "String"
+        },
+        "DMZSubnetName": {
+            "defaultValue": "DMZSubnet",
+            "type": "String"
+        },
+        "DMZSubnetSpace": {
+            "defaultValue": "192.168.0.0/26",
+            "type": "String"
+        },
+        "GatewaySubnetSpace": {
+            "defaultValue": "192.168.0.192/26",
+            "type": "String"
+        }
+        
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-09-01",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('virtualNetworkNameAddressSpace')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": [
+                        "192.168.0.68","192.168.0.69"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('ActiveDirectorySubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('ActiveDirectorySubnetSpace')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[parameters('ManagementSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('ManagementSubnetSpace')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('GatewaySubnetSpace')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[parameters('DMZSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('DMZSubnetSpace')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    }
+                ],
+                
+                "enableDdosProtection": false,
+                "enableVmProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('virtualNetworkName'), '/' ,parameters('DMZSubnetName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('DMZSubnetSpace')]",
+                "serviceEndpoints": [],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('virtualNetworkName'), '/' ,parameters('ManagementSubnetName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('ManagementSubnetSpace')]",
+                "serviceEndpoints": [],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('virtualNetworkName'), '/' ,parameters('ActiveDirectorySubnetName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('ActiveDirectorySubnetSpace')]",
+                "serviceEndpoints": [],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('virtualNetworkName'), '/GatewaySubnet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('GatewaySubnetSpace')]",
+                "serviceEndpoints": [],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        }
+        
+        
+    ]
+}
