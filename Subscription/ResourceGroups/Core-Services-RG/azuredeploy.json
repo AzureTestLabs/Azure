@@ -12,28 +12,28 @@
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
       "location": "WestUS",
-      "name": "Core-Network-WestUS-RG",
+      "name": "Core-Network-RG",
       "properties": {}
     },
     {
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
       "location": "WestUS",
-      "name": "Core-ADDS-WestUS-RG",
+      "name": "Core-ADDS-RG",
       "properties": {}
     },
     {
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
       "location": "WestUS",
-      "name": "Core-Management-WestUS-RG",
+      "name": "Core-Management-RG",
       "properties": {}
     },
      {
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
       "location": "WestUS",
-      "name": "Core-DMZ-WestUS-RG",
+      "name": "Core-DMZ-RG",
       "properties": {}
     }
   ]
