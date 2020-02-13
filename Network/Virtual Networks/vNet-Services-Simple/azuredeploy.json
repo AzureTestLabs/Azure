@@ -32,6 +32,16 @@
                 },
                 "subnets": [
                     {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "192.168.0.0/26",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
                         "name": "ADDS",
                         "properties": {
                             "addressPrefix": "192.168.0.64/26",
@@ -51,20 +61,10 @@
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     },
-                    {
-                        "name": "GatewaySubnet",
-                        "properties": {
-                            "addressPrefix": "192.168.0.192/26",
-                            "serviceEndpoints": [],
-                            "delegations": [],
-                            "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
-                        }
-                    },
-                    {
+                                       {
                         "name": "DMZ",
                         "properties": {
-                            "addressPrefix": "192.168.0.0/26",
+                            "addressPrefix": "192.168.0.192/26",
                             "serviceEndpoints": [],
                             "delegations": [],
                             "privateEndpointNetworkPolicies": "Enabled",
