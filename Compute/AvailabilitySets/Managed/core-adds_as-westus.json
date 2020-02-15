@@ -6,7 +6,7 @@
 
     "avaialabilitySetName": {
       "type": "string",
-      "defaultValue": "MyAS",
+      "defaultValue": "ADDS_AS_WestUS",
       "metadata": {
         "description": "Availability Set Name."
       }

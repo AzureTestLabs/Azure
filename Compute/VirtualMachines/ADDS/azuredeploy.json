@@ -1,0 +1,325 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.7.2",
+    "metadata":{
+        "comments": "This template was developed for demonstation purposes of Azure AD DC",
+        "author": "James Ellis"
+    },
+    "parameters": {
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "NS3",
+            "metadata": {
+                "description": "Computer Name for the Virtual Machine."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "azureadmin",
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": "P@$$W0rd",
+            "metadata": {
+                "description": "Password for the Virtual Machine."
+            }
+        },
+        "windowsOSVersion": {
+            "type": "string",
+            "defaultValue": "2019-Datacenter-smalldisk",
+            "allowedValues": [
+                "2016-Datacenter",
+                "2016-Datacenter-Server-Core",
+                "2016-Datacenter-Server-Core-smalldisk",
+                "2016-Datacenter-smalldisk",
+                "2019-Datacenter",
+                "2019-Datacenter-Core",
+                "2019-Datacenter-Core-smalldisk",
+                "2019-Datacenter-smalldisk"
+            ],
+            "metadata": {
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+            }
+        },
+            "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+            "allowedValues": [
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_D2s_v3",
+                "Standard_D4s_v3"
+            ],
+            "metadata": {
+                "description": "VM Size SKU"
+            }
+        },
+        "existingAvailabilitySetName": {
+            "type": "string",
+            "defaultValue": "ADDS_AS_WestUS",
+            "metadata": {
+                "description": "Name of the existing Availabilty Set"
+            }
+        },
+        
+        "existingVirtualNetworkName": {
+            "type": "string",
+            "defaultValue": "Core-vNet0-WestUS",
+            "metadata": {
+                "description": "Name of the existing VNET"
+             }
+        },
+
+        "existingVirtualNetworkResourceGroup":{  
+            "type":"string",
+            "defaultValue":"Core-Network-WestUS-RG",
+            "metadata":{  
+                "description":"Name of the existing VNET resource group"
+            }
+        },
+
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "ADDS",
+            "metadata": {
+                "description": "Name of the subnet in the virtual network you want to use"
+            }
+         },
+        "departmentName": {
+            "type": "string",
+            "defaultValue": "000",
+			"minLength": 3,
+			"maxLength":3,
+			
+            "metadata": {
+                "description": "Department Number Tag ### (000-999)"
+            }
+        },
+        "environmentName": {
+            "type": "string",
+            "defaultValue": "Prod",
+            "metadata": {
+                "description": "Environnment Name Tag"
+            }
+        },
+        "sectionName": {
+            "type": "string",
+            "defaultValue": "administration",
+            "metadata": {
+                "description": "Section Name Tag"
+            }
+        }
+        
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+
+        "storageprefix": "sa",
+        "storageAccountName": "[toLower( concat( variables('storageprefix'), uniqueString(resourceGroup().id) ) )]",
+        
+		"imagePublisher": "MicrosoftWindowsServer",
+        "imageOffer": "WindowsServer",
+        
+        
+        "networkSecurityGroupName": "[concat(parameters('virtualMachineName'), '_', 'NSG')]",
+		"nicName": "[concat(parameters('virtualMachineName'), '_', 'NIC')]",
+        "addressPrefix": "10.0.0.0/16",
+        "subnetName": "default",
+        "subnetPrefix": "10.0.0.0/24",
+        "publicIPAddressName": "[concat(parameters('virtualMachineName'),'_','PIP')]",
+        	
+        
+		
+        "subnetRef": "[resourceId(parameters('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVirtualNetworkName'),  parameters('subnetName'))]"
+        
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-04-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[variables('location')]",
+            "metadata": {
+                "comments": "These tags are required for policy compliance."
+             },
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Environment": "[parameters('environmentName')]",
+                "Section": "[parameters('sectionName')]"
+             },
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "Storage",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2018-11-01",
+            "name": "[variables('publicIPAddressName')]",
+            "location": "[variables('location')]",
+            "metadata": {
+                "comments": "These tags are required for policy compliance."
+             },
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Environment": "[parameters('environmentName')]",
+                "Section": "[parameters('sectionName')]"
+             },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+                
+            }
+        },
+        {
+            "comments": "Default Network Security Group for template",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-09-01",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[variables('location')]",
+            "metadata": {
+                "comments": "These tags are required for policy compliance."
+             },
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Environment": "[parameters('environmentName')]",
+                "Section": "[parameters('sectionName')]"
+             },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-3389",
+                        "properties": {
+                            "description": "Allow RDP",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound"
+                         }
+                    }
+                ]
+            }
+        },
+        
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-09-01",
+            "name": "[variables('nicName')]",
+            "location": "[variables('location')]",
+            "metadata": {
+                "comments": "These tags are required for policy compliance."
+             },
+            "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Environment": "[parameters('environmentName')]",
+                "Section": "[parameters('sectionName')]"
+             },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+                
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "comments": "Build the VM",
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('virtualMachineName')]",
+            "location": "[variables('location')]",
+            "metadata": {
+                "comments": "These tags are required for policy compliance."
+             },
+             "tags": {
+                "Department": "[parameters('departmentName')]",
+                "Environment": "[parameters('environmentName')]",
+                "Section": "[parameters('sectionName')]"
+             },
+          
+            
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                    "storageProfile": {
+                        "imageReference": {
+                            "publisher": "[variables('imagePublisher')]",
+                            "offer": "[variables('imageOffer')]",
+                            "sku": "[parameters('windowsOSVersion')]",
+                            "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat(parameters('virtualMachineName'), '_OSDisk_0')]",
+                        "caching": "None",
+                        "createOption": "FromImage"
+                        
+                     },
+                     "dataDisks": [
+                        {
+                            "lun": 0,
+                            "name": "[concat(parameters('virtualMachineName'), '_DataDisk_1')]",
+                            "createOption": "Empty",
+                            "diskSizeGB": 32
+                        }
+                     ]
+                 },
+                    "osProfile": {
+                        "computerName": "[parameters('virtualMachineName')]",
+                        "adminUsername": "[parameters('adminUsername')]",
+                        "adminPassword": "[parameters('adminPassword')]",
+                        "windowsConfiguration": {
+                            "enableAutomaticUpdates": "true",
+                            "timeZone": "Pacific Standard Time" 
+                        }
+                    },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                    "enabled": "true",
+                    "storageUri": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net')]"
+                    }
+                }, 
+                 "availabilitySet": {
+                      "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('existingAvailabilitySetName'))]"
+                },
+                  "licenseType": "Windows_Server"
+                
+            }
+          
+         }
+    
+      
+    ]
+}

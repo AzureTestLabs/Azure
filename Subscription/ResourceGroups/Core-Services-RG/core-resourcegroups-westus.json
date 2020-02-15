@@ -40,7 +40,7 @@
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
       "location": "WestUS",
-      "name": "Core-DMZ-West-US-RG",
+      "name": "Core-DMZ-WestUS-RG",
       "properties": {}
     }
   ]

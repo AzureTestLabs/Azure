@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+
+  "parameters": {
+
+    "avaialabilitySetName": {
+      "type": "string",
+      "defaultValue": "ADDS_AS_EastUS",
+      "metadata": {
+        "description": "Availability Set Name."
+      }
+    },
+    "faultDomains": {
+      "type": "string",
+      "defaultValue": "2",
+      "metadata": {
+        "description": "# of Fault Domains."
+      }
+    },
+    "updateDomains": {
+      "type": "string",
+      "defaultValue": "5",
+      "metadata": {
+        "description": "# of Update Domains."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    }
+  },
+
+  "resources": [
+
+    {
+
+      "type": "Microsoft.Compute/availabilitySets",
+
+      "name": "[parameters('avaialabilitySetName')]",
+
+      "apiVersion": "2019-07-01",
+
+      "location": "[parameters('location')]",
+      "sku": {
+                "name": "Aligned"
+            },
+
+      "properties": {
+
+        "platformFaultDomainCount": "[parameters('faultDomains')]",
+
+        "platformUpdateDomainCount": "[parameters('updateDomains')]"
+
+      }
+
+    }
+
+  ]
+
+}

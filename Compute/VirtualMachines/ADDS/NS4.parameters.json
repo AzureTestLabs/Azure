@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachineName": {
+        "value": "NS4"
+      },
+	  "existingAvailabilitySetName": {
+        "value": "ADDS_AS_EastUS"
+      },
+	  "existingVirtualNetworkName": {
+        "value": "Core-vNet10-EastUS"
+      },
+	  "existingVirtualNetworkResourceGroup": {
+        "value": "Core-Network-EastUS-RG"
+      },
+    "adminUsername": {
+      "value": "AzureAdmin"
+    },
+    "adminPassword": {
+      "value": "Pa55w.rd1234"
+    }
+  }
+}
+

@@ -2,15 +2,21 @@
 
 Resource Groups for Shared services Hub & Spoke Network
 
-<p>Core-Network-WestUS-RG
-<p>Core-ADDS-WestUS-RG
-<p>Core-Management-WestUS-RG
-<p>Core-DMZ-WestUS-RG
+<p>Core-Network-<location>-RG
+<p>Core-ADDS-<location>-RG
+<p>Core-Management-<location>-RG
+<p>Core-DMZ-<location>-RG
+<p>Core-LogAnalytics-<location>-RG
+
 
 
 New-AzDeployment `
-  -Name coreResourceGroupDeployment `
-  -Location westus `
-  -TemplateUri https://raw.githubusercontent.com/AzureTestLabs/Azure/master/Subscription/ResourceGroups/Core-Services-RG/azuredeploy.json 
+-Name coreResourceGroupDeploymentEast `
+-Location eastus `
+-TemplateFile core-resourcegroups-eastus.json
 
+New-AzDeployment `
+-Name coreResourceGroupDeploymentWest `
+-Location westus `
+-TemplateFile core-resourcegroups-westus.json
 
